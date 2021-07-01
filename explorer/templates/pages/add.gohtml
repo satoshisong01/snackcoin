@@ -1,0 +1,16 @@
+{{define "add"}}
+    <!DOCTYPE html>
+    <html lang="en">
+    {{template "head" "Add"}}
+    <body>
+        {{template "header" "Add"}}
+        <main>
+            <form method="POST">
+                <input type="text" placeholder="작성하라 핫산!" required name="blockData" />
+                <button>블록 추가</button>
+            </form>
+        </main>
+        {{template "footer"}}
+    </body>
+    </html>
+{{end}}

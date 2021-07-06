@@ -1,12 +1,12 @@
 {{define "home"}}
     <!DOCTYPE html>
     <html lang="en">
-    {{template "head" .PageTitle}}
+    {{template "head" .PageTitle}} <!-- template 은 불러오고 define은 선언 -->
     <body>
         {{template "header" .PageTitle}}
         <main>
             {{range .Blocks}}
-                {{template "block" .}}
+                {{template "block" .}} <!--range 안에 있는 . 은 블록내부에 있는 블록을 가르킴 (Block template에 Block struct 전체를 보냄) -->
             {{end}}
         </main>
         {{template "footer"}}

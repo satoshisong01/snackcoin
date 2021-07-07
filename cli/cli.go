@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/sks8982/snackcoin/explorer"
 	"github.com/sks8982/snackcoin/rest"
@@ -15,7 +16,7 @@ func usage() {
 	fmt.Printf("커맨드를 입력해 주세요\n\n")
 	fmt.Printf("-port: Set PORT of the Server\n")
 	fmt.Printf("-mode: html 과 rest api중 골라주세요\n\n")
-	os.Exit(0) //종료
+	runtime.Goexit() //db.Close닫을 시간을위해 타임아웃
 }
 
 func Start() {

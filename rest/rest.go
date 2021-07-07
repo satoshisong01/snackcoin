@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/sks8982/snackcoin/blockchain"
@@ -57,7 +56,7 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			Payload:     "data:string",
 		},
 		{
-			URL:         url("/blocks/{height}"),
+			URL:         url("/blocks/{hash}"),
 			Method:      "GET",
 			Description: "See A block",
 			Payload:     "data:string",
@@ -69,21 +68,19 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-
-		json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
+		json.NewEncoder(rw).Encode(blockchain.Blockchain().Blocks())
 	case "POST":
 		var addBlockBody addBlockBody                                  //변수, 구조체 두개
 		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody)) //쓸때는 Encode 읽어올때는 Decode / utils.handleErr 에러처리
-		blockchain.GetBlockchain().AddBlock(addBlockBody.Message)      //블록체인 추가
+		blockchain.Blockchain().AddBlock(addBlockBody.Message)         //블록체인 추가
 		rw.WriteHeader(http.StatusCreated)                             //status code보내기 201
 	}
 }
 
 func block(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["height"])
-	utils.HandleErr(err)
-	block, err := blockchain.GetBlockchain().GetBlock(id) //go언어 형변환
+	hash := vars["hash"]
+	block, err := blockchain.FindBlock(hash) //go언어 형변환
 	encoder := json.NewEncoder(rw)
 	if err == blockchain.ErrNotFound {
 		encoder.Encode(errorRespone{fmt.Sprint(err)})
@@ -106,7 +103,7 @@ func Start(aPort int) {
 	router.Use(jsonContentTypeMiddleware)
 	router.HandleFunc("/", documentation).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
-	router.HandleFunc("/blocks/{height:[0-9]+}", block).Methods("GET") //gorilla/mux를 사용하여 아이디에 조건을 넣을수 있음
+	router.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET") //gorilla/mux를 사용하여 아이디에 조건을 넣을수 있음
 	fmt.Printf("http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
